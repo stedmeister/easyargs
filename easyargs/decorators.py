@@ -1,9 +1,20 @@
 import parsers
+import functools
 
-def make_easy_args(obj):
-    def internal_func(*args, **kwargs):
-        parser = parsers.create_base_parser(obj)
-        parsers.function_parser(obj, parser)
-        parsers.handle_parser(parser)
+def make_easy_args(obj=None, auto_call=True):
+    def decorate(f):
+        @functools.wraps(f)
+        def decorated(*args, **kwargs):
+            parser = parsers.create_base_parser(f)
+            parsers.function_parser(f, parser)
+            if auto_call:
+                parsers.handle_parser(parser)
 
-    return internal_func
+
+            return parser
+        return decorated
+
+    if obj != None:
+        return decorate(obj)
+
+    return decorate
