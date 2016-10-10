@@ -3,7 +3,7 @@ easyargs
 
 A project designed to make command line argument parsing easy.
 
-It is used as follows:
+It is used as follows::
 
     import easyargs
 
@@ -20,7 +20,7 @@ It is used as follows:
 In this (rather contrived) example, main will be inspected and the arg keywords
 will be turned into positional arguments and the kwarg keywords will be turned
 into optional arguments.  This can be seen if we run the above script with the
-help flag:
+help flag::
 
     $ python simple.py -h
     usage: simple_test.py [-h] [--count COUNT] [--greeting GREETING] name
@@ -37,7 +37,7 @@ help flag:
 
 Note are that program description is automatically created
 based on the docstring of the function.  Also note that the type of the default
-value is inspected so that the value of count is coerced to an integer.
+value is inspected so that the value of count is coerced to an integer::
 
     $ python simple.py World
     Hello World
