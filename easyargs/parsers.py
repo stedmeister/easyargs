@@ -13,8 +13,6 @@ def handle_parser(parser):
         if value != None:
             actual_args[argument] = value
 
-    function(**actual_args)
-
 def create_base_parser(obj):
     # Get the help text for the function
     help_text = inspect.getdoc(obj)
@@ -22,7 +20,7 @@ def create_base_parser(obj):
     parser = argparse.ArgumentParser(description=help_text)
     return parser
 
-def calculate_default_type(arg, default_value):
+def calculate_default_type(arg, has_default, default_value):
     """This function looks at the default value and returns the type that
        should be supplied to the parser"""
     positional = True
@@ -30,7 +28,7 @@ def calculate_default_type(arg, default_value):
     arg_name = arg
 
     # If we have a default value, then this is not positional
-    if default_value != None:
+    if has_default:
         positional = False
 
     # Special case when a base type is supplied
@@ -65,9 +63,14 @@ def function_parser(function, parser):
 
     # Get the function information
     args, varargs, keywords, defaults = inspect.getargspec(function)
+    if args == None:
+        args = []
+
+    if defaults == None:
+        defaults = []
 
     # If the function is a class method, it will have a self that needs to be removed
-    if args[0] == 'self':
+    if len(args) and args[0] == 'self':
         args.pop(0)
 
     # Work out whether the argument has a default by subtracting the length
@@ -75,9 +78,9 @@ def function_parser(function, parser):
     num_required_args = len(args) - len(defaults)
     for idx, arg in enumerate(args):
         if idx < num_required_args:
-            arg_name, arg_params = calculate_default_type(arg, None)
+            arg_name, arg_params = calculate_default_type(arg, False, None)
         else:
             default_value = defaults[idx - num_required_args]
-            arg_name, arg_params = calculate_default_type(arg, default_value)
+            arg_name, arg_params = calculate_default_type(arg, True, default_value)
 
         parser.add_argument(arg_name, **arg_params)
