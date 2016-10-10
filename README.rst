@@ -24,7 +24,7 @@ will be turned into positional arguments and the kwarg keywords will be turned
 into optional arguments.  This can be seen if we run the above script with the
 help flag:
 
-.. code:: bash
+.. code::
 
     $ python simple.py -h
     usage: simple_test.py [-h] [--count COUNT] [--greeting GREETING] name
@@ -43,7 +43,7 @@ Note are that program description is automatically created
 based on the docstring of the function.  Also note that the type of the default
 value is inspected so that the value of count is coerced to an integer:
 
-.. code:: bash
+.. code::
 
     $ python simple.py World
     Hello World
