@@ -1,5 +1,6 @@
 import inspect
 import argparse
+import six
 
 def handle_parser(parser):
     args = vars( parser.parse_args() )
@@ -9,7 +10,7 @@ def handle_parser(parser):
 
     # Remove any arguments that have not been supplied
     actual_args = {}
-    for argument, value in args.iteritems():
+    for argument, value in six.iteritems(args):
         if value != None:
             actual_args[argument] = value
 
