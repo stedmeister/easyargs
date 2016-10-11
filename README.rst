@@ -1,6 +1,9 @@
 easyargs
 ========
 
+.. image:: https://travis-ci.org/stedmeister/easyargs.svg?branch=master
+    :target: https://travis-ci.org/stedmeister/easyargs
+
 A project designed to make command line argument parsing easy.
 
 It is used as follows:
