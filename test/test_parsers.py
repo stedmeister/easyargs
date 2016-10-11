@@ -47,6 +47,18 @@ class TestDecorator(unittest.TestCase):
             main_with_only_opt_args()
 
 class TestSampleInterfaces(unittest.TestCase):
+    def test_function_is_actually_called(self):
+
+        called = mock.MagicMock()
+
+        @easyargs
+        def main(name, count=1, greeting='Hello'):
+            called(name, count, greeting)
+
+        with mock.patch('sys.argv', [__name__, 'Joe']):
+            main()
+            called.assert_called_with('Joe', 1, 'Hello')
+
     def test_example(self):
 
         @easyargs(auto_call=False)

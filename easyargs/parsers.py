@@ -14,6 +14,9 @@ def handle_parser(parser):
         if value != None:
             actual_args[argument] = value
 
+    # Call the original function with the parser args
+    function(**actual_args)
+
 def create_base_parser(obj):
     # Get the help text for the function
     help_text = inspect.getdoc(obj)
