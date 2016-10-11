@@ -1,4 +1,4 @@
-import parsers
+from . import parsers
 import functools
 
 def make_easy_args(obj=None, auto_call=True):
