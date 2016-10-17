@@ -6,16 +6,19 @@ def handle_parser(parser):
     args = vars( parser.parse_args() )
 
     # Get the handler function
-    function = args.pop('func')
+    try:
+        function = args.pop('func')
+    except KeyError:
+        return
 
     # Remove any arguments that have not been supplied
-    actual_args = {}
-    for argument, value in six.iteritems(args):
-        if value != None:
-            actual_args[argument] = value
+    # actual_args = {}
+    # for argument, value in six.iteritems(args):
+    #     if value != None:
+    #         actual_args[argument] = value
 
     # Call the original function with the parser args
-    function(**actual_args)
+    function(**args)
 
 def create_base_parser(obj):
     # Get the help text for the function
@@ -51,7 +54,14 @@ def calculate_default_type(arg, has_default, default_value):
         arg_params['type'] = type(default_value)
 
     # Update the arg_name
-    if not positional:
+    if positional:
+        if arg_name.startswith('_'):
+            arg_params['nargs'] = '?'
+            arg_params['default'] = None
+            arg_params['metavar'] = arg_name.lstrip('_')
+            #arg_name = arg_name.lstrip('_')
+    else:
+        arg_params['default'] = default_value
         if len(arg_name) == 1:
             arg_name = '-' + arg_name
         else:
@@ -88,3 +98,23 @@ def function_parser(function, parser):
             arg_name, arg_params = calculate_default_type(arg, True, default_value)
 
         parser.add_argument(arg_name, **arg_params)
+
+def filter_private_methods(method):
+    """Simple filter method.  Ignores private functions"""
+    return not method.startswith('_')
+
+def class_parser(klass, parser, method_filter=filter_private_methods):
+    # Create a subparser object to handle the sub commands
+    subparsers = parser.add_subparsers(help='sub-command help')
+
+    # Find all of the methods in the object instance
+    all_methods = inspect.getmembers(klass, inspect.ismethod)
+
+    # Let's filter the list down to what we actually want to expose
+    methods_to_expose = [m for m in all_methods if method_filter(m[0])]
+
+    # Let's now create a sub parser for each method found
+    for name, method in methods_to_expose:
+        help_text = inspect.getdoc(method)
+        method_parser = subparsers.add_parser(name, help=help_text)
+        function_parser(method, method_parser)

@@ -1,7 +1,34 @@
+from __future__ import print_function
+
 import unittest
 import mock
+import StringIO
+
 
 import easyargs
+
+@mock.patch('sys.stderr', new_callable=StringIO.StringIO)
+@mock.patch('sys.stdout', new_callable=StringIO.StringIO)
+@mock.patch('sys.exit')
+def parser_test_helper(parser,
+                       call_function,
+                       arguments,
+                       expected_values,
+                       exit_called,
+                       stdout,
+                       stderr):
+
+    mocked_sysv = [__name__] + arguments
+    with mock.patch('sys.argv', mocked_sysv):
+        result = parser()
+        if expected_values == None:
+            call_function.assert_not_called()
+        else:
+            call_function.assert_called_with(*expected_values)
+
+    #exit_called.assert_not_called()
+
+    return stdout.getvalue(), stderr.getvalue()
 
 # Work out how to mock the function
 class TestDecorator(unittest.TestCase):
@@ -71,9 +98,53 @@ class TestSampleInterfaces(unittest.TestCase):
         result = parser.parse_args(['person'])
         result = vars(result)
         del result['func']
-        self.assertEqual(result, { 'name': 'person', 'count': None, 'greeting': None })
+        self.assertEqual(result, { 'name': 'person', 'count': 1, 'greeting': 'Hello' })
 
         result = parser.parse_args(['person', '--count', '4'])
         result = vars(result)
         del result['func']
-        self.assertEqual(result, { 'name': 'person', 'count': 4, 'greeting': None })
+        self.assertEqual(result, { 'name': 'person', 'count': 4, 'greeting': 'Hello' })
+
+
+class TestGitCloneExample(unittest.TestCase):
+    def setUp(self):
+        called = mock.MagicMock()
+        self.function_called = called
+        @easyargs
+        class GitClone(object):
+            """A git clone"""
+
+            def clone(self, src, _dest):
+                """Clone a repository"""
+                called(src, _dest)
+
+            def commit(self, a=False, m=None, amend=False):
+                """Commit a change to the index"""
+                called(a, m, ammend)
+
+        self.parser = GitClone
+
+    def test_help_text(self):
+        stdout, stderr = parser_test_helper(self.parser,
+                         self.function_called,
+                         ['-h'],
+                         None)
+
+        self.assertEqual(stdout, """usage: test_parsers [-h] {clone,commit} ...
+
+A git clone
+
+positional arguments:
+  {clone,commit}  sub-command help
+    clone         Clone a repository
+    commit        Commit a change to the index
+
+optional arguments:
+  -h, --help      show this help message and exit
+""")
+
+    def test_simple_clone(self):
+        parser_test_helper(self.parser,
+                           self.function_called,
+                           ['clone', 'git@github.com/user/repo'],
+                           ('git@github.com/user/repo', None))
