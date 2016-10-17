@@ -2,13 +2,13 @@ from __future__ import print_function
 
 import unittest
 import mock
-import StringIO
+import six
 
 
 import easyargs
 
-@mock.patch('sys.stderr', new_callable=StringIO.StringIO)
-@mock.patch('sys.stdout', new_callable=StringIO.StringIO)
+@mock.patch('sys.stderr', new_callable=six.StringIO)
+@mock.patch('sys.stdout', new_callable=six.StringIO)
 @mock.patch('sys.exit')
 def parser_test_helper(parser,
                        call_function,
