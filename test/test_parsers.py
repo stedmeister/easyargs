@@ -4,29 +4,37 @@ import unittest
 import mock
 import six
 
-
 import easyargs
 
-@mock.patch('sys.stderr', new_callable=six.StringIO)
-@mock.patch('sys.stdout', new_callable=six.StringIO)
-@mock.patch('sys.exit')
+class SysExitCalled(Exception):
+    """This exception will be thrown when sys.exit is called.  This
+       is needed to 'halt' program execution."""
+
+
 def parser_test_helper(parser,
                        call_function,
                        arguments,
                        expected_values,
-                       exit_called,
-                       stdout,
-                       stderr):
+                       exit_expected):
 
     mocked_sysv = [__name__] + arguments
-    with mock.patch('sys.argv', mocked_sysv):
-        result = parser()
-        if expected_values == None:
-            call_function.assert_not_called()
-        else:
-            call_function.assert_called_with(*expected_values)
+    with mock.patch('sys.argv', mocked_sysv) as foo, \
+         mock.patch('sys.stdout', new_callable=six.StringIO) as stdout, \
+         mock.patch('sys.stderr', new_callable=six.StringIO) as stderr, \
+         mock.patch('sys.exit') as exit_called:
 
-    #exit_called.assert_not_called()
+        exit_called.side_effect = SysExitCalled('sys.exit()')
+        try:
+            result = parser()
+        except SysExitCalled:
+            pass
+
+        assert(exit_called.called == exit_expected)
+        if not exit_called.called:
+            if expected_values == None:
+                call_function.assert_not_called()
+            else:
+                call_function.assert_called_with(*expected_values)
 
     return stdout.getvalue(), stderr.getvalue()
 
@@ -120,7 +128,7 @@ class TestGitCloneExample(unittest.TestCase):
 
             def commit(self, a=False, m=None, amend=False):
                 """Commit a change to the index"""
-                called(a, m, ammend)
+                called(a, m, amend)
 
         self.parser = GitClone
 
@@ -128,7 +136,8 @@ class TestGitCloneExample(unittest.TestCase):
         stdout, stderr = parser_test_helper(self.parser,
                          self.function_called,
                          ['-h'],
-                         None)
+                         None,
+                         True)
 
         self.assertEqual(stdout, """usage: test_parsers [-h] {clone,commit} ...
 
@@ -144,7 +153,61 @@ optional arguments:
 """)
 
     def test_simple_clone(self):
+        """A test to ensure that basic argument parsing works"""
         parser_test_helper(self.parser,
                            self.function_called,
                            ['clone', 'git@github.com/user/repo'],
-                           ('git@github.com/user/repo', None))
+                           ('git@github.com/user/repo', None),
+                           False)
+
+    def test_invalid_clone_parameters(self):
+        """Make sure that an error is raised when not enough arguments are parsed"""
+        stdout, stderr = parser_test_helper(self.parser,
+                                            self.function_called,
+                                            ['clone'],
+                                            None,
+                                            True)
+
+        assert(stderr == """usage: test_parsers clone [-h] src [dest]
+test_parsers clone: error: too few arguments
+""")
+
+    def test_commit_no_parameters(self):
+        """This tests just the commit parameters i.e. git commit"""
+        stdout, stderr = parser_test_helper(self.parser,
+                                            self.function_called,
+                                            ['commit'],
+                                            (False, None, False),
+                                            False)
+
+    def test_commit_add_no_message(self):
+        """This tests the equivalent of git commit -a"""
+        stdout, stderr = parser_test_helper(self.parser,
+                                            self.function_called,
+                                            ['commit', '-a'],
+                                            (True, None, False),
+                                            False)
+
+    def test_commit_with_message(self):
+        """This tests the equivalent of git commit -m "message" """
+        stdout, stderr = parser_test_helper(self.parser,
+                                            self.function_called,
+                                            ['commit', '-m', 'This is my message'],
+                                            (False, 'This is my message', False),
+                                            False)
+
+    def test_commit_with_amend_flag(self):
+        """This is the equivalent to git commit --amend"""
+        stdout, stderr = parser_test_helper(self.parser,
+                                            self.function_called,
+                                            ['commit', '--amend'],
+                                            (False, None, True),
+                                            False)
+
+    def test_commit_with_all_options(self):
+        """This is the equivalent to git commit -am "Foo" --amend"""
+        stdout, stderr = parser_test_helper(self.parser,
+                                            self.function_called,
+                                            ['commit', '-am', 'Foo', '--amend'],
+                                            (True, 'Foo', True),
+                                            False)
