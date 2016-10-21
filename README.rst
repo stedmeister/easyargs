@@ -67,8 +67,8 @@ The goal of easyargs is to avoid having complicated configuration parameters,
 and let the function specify things, however, the following list of rules might
 be useful:
 
-- `main(arg)`: arg is a required positional argument
-- main(_arg): arg is an optional positional argument
+- ``main(arg)``: arg is a required positional argument
+- `main(_arg)`: arg is an optional positional argument
 - main(arg=int, _arg=int): Setting a default value as a basic type will keep
   the argument positional, but coerce it to that type
   only tested with int / float
