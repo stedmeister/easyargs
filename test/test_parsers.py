@@ -1,7 +1,44 @@
+from __future__ import print_function
+
 import unittest
 import mock
+import six
 
 import easyargs
+
+class SysExitCalled(Exception):
+    """This exception will be thrown when sys.exit is called.  This
+       is needed to 'halt' program execution."""
+
+
+def parser_test_helper(parser,
+                       call_function,
+                       arguments,
+                       expected_values,
+                       exit_expected):
+
+    mocked_sysv = [__name__] + arguments
+    @mock.patch('sys.argv', mocked_sysv)
+    @mock.patch('sys.stdout', new_callable=six.StringIO)
+    @mock.patch('sys.stderr', new_callable=six.StringIO)
+    @mock.patch('sys.exit')
+    def handle_parser_call(exit_called, stderr, stdout):
+        exit_called.side_effect = SysExitCalled('sys.exit()')
+        try:
+            result = parser()
+        except SysExitCalled:
+            pass
+
+        assert(exit_called.called == exit_expected)
+        if not exit_called.called:
+            if expected_values == None:
+                call_function.assert_not_called()
+            else:
+                call_function.assert_called_with(*expected_values)
+        return stdout, stderr
+
+    stdout, stderr = handle_parser_call()
+    return stdout.getvalue(), stderr.getvalue()
 
 # Work out how to mock the function
 class TestDecorator(unittest.TestCase):
@@ -71,9 +108,107 @@ class TestSampleInterfaces(unittest.TestCase):
         result = parser.parse_args(['person'])
         result = vars(result)
         del result['func']
-        self.assertEqual(result, { 'name': 'person', 'count': None, 'greeting': None })
+        self.assertEqual(result, { 'name': 'person', 'count': 1, 'greeting': 'Hello' })
 
         result = parser.parse_args(['person', '--count', '4'])
         result = vars(result)
         del result['func']
-        self.assertEqual(result, { 'name': 'person', 'count': 4, 'greeting': None })
+        self.assertEqual(result, { 'name': 'person', 'count': 4, 'greeting': 'Hello' })
+
+
+class TestGitCloneExample(unittest.TestCase):
+    def setUp(self):
+        called = mock.MagicMock()
+        self.function_called = called
+        @easyargs
+        class GitClone(object):
+            """A git clone"""
+
+            def clone(self, src, _dest):
+                """Clone a repository"""
+                called(src, _dest)
+
+            def commit(self, a=False, m=None, amend=False):
+                """Commit a change to the index"""
+                called(a, m, amend)
+
+        self.parser = GitClone
+
+    def test_help_text(self):
+        stdout, stderr = parser_test_helper(self.parser,
+                         self.function_called,
+                         ['-h'],
+                         None,
+                         True)
+        self.assertEqual(stdout, """usage: test_parsers [-h] {clone,commit} ...
+
+A git clone
+
+positional arguments:
+  {clone,commit}  sub-command help
+    clone         Clone a repository
+    commit        Commit a change to the index
+
+optional arguments:
+  -h, --help      show this help message and exit
+""")
+
+    def test_simple_clone(self):
+        """A test to ensure that basic argument parsing works"""
+        parser_test_helper(self.parser,
+                           self.function_called,
+                           ['clone', 'git@github.com/user/repo'],
+                           ('git@github.com/user/repo', None),
+                           False)
+
+    def test_invalid_clone_parameters(self):
+        """Make sure that an error is raised when not enough arguments are parsed"""
+        stdout, stderr = parser_test_helper(self.parser,
+                                            self.function_called,
+                                            ['clone'],
+                                            None,
+                                            True)
+
+        # Output signature changed in python 3, so must assert on part of message
+        self.assertTrue("""usage: test_parsers clone [-h] src [dest]
+test_parsers clone: error:""" in stderr)
+
+    def test_commit_no_parameters(self):
+        """This tests just the commit parameters i.e. git commit"""
+        stdout, stderr = parser_test_helper(self.parser,
+                                            self.function_called,
+                                            ['commit'],
+                                            (False, None, False),
+                                            False)
+
+    def test_commit_add_no_message(self):
+        """This tests the equivalent of git commit -a"""
+        stdout, stderr = parser_test_helper(self.parser,
+                                            self.function_called,
+                                            ['commit', '-a'],
+                                            (True, None, False),
+                                            False)
+
+    def test_commit_with_message(self):
+        """This tests the equivalent of git commit -m "message" """
+        stdout, stderr = parser_test_helper(self.parser,
+                                            self.function_called,
+                                            ['commit', '-m', 'This is my message'],
+                                            (False, 'This is my message', False),
+                                            False)
+
+    def test_commit_with_amend_flag(self):
+        """This is the equivalent to git commit --amend"""
+        stdout, stderr = parser_test_helper(self.parser,
+                                            self.function_called,
+                                            ['commit', '--amend'],
+                                            (False, None, True),
+                                            False)
+
+    def test_commit_with_all_options(self):
+        """This is the equivalent to git commit -am "Foo" --amend"""
+        stdout, stderr = parser_test_helper(self.parser,
+                                            self.function_called,
+                                            ['commit', '-am', 'Foo', '--amend'],
+                                            (True, 'Foo', True),
+                                            False)
