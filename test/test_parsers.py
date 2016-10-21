@@ -18,10 +18,11 @@ def parser_test_helper(parser,
                        exit_expected):
 
     mocked_sysv = [__name__] + arguments
-    with mock.patch('sys.argv', mocked_sysv) as foo, \
-         mock.patch('sys.stdout', new_callable=six.StringIO) as stdout, \
-         mock.patch('sys.stderr', new_callable=six.StringIO) as stderr, \
-         mock.patch('sys.exit') as exit_called:
+    @mock.patch('sys.argv', mocked_sysv)
+    @mock.patch('sys.stdout', new_callable=six.StringIO)
+    @mock.patch('sys.stderr', new_callable=six.StringIO)
+    @mock.patch('sys.exit')
+    def handle_parser_call(exit_called, stderr, stdout):
 
         exit_called.side_effect = SysExitCalled('sys.exit()')
         try:
@@ -35,7 +36,9 @@ def parser_test_helper(parser,
                 call_function.assert_not_called()
             else:
                 call_function.assert_called_with(*expected_values)
+        return stdout, stderr
 
+    stdout, stderr = handle_parser_call()
     return stdout.getvalue(), stderr.getvalue()
 
 # Work out how to mock the function
@@ -138,7 +141,6 @@ class TestGitCloneExample(unittest.TestCase):
                          ['-h'],
                          None,
                          True)
-
         self.assertEqual(stdout, """usage: test_parsers [-h] {clone,commit} ...
 
 A git clone
@@ -168,7 +170,7 @@ optional arguments:
                                             None,
                                             True)
 
-        assert(stderr == """usage: test_parsers clone [-h] src [dest]
+        self.assertEqual(stderr, """usage: test_parsers clone [-h] src [dest]
 test_parsers clone: error: too few arguments
 """)
 
