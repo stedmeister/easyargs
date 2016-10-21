@@ -70,8 +70,8 @@ be useful:
 - main(arg): arg is a required positional argument
 - main(_arg): arg is an optional positional argument
 - main(arg=int, _arg=int): Setting a default value as a basic type will keep
-                           the argument positional, but coerce it to that type
-                           only tested with int / float
+  the argument positional, but coerce it to that type
+  only tested with int / float
 - main(arg=list): Setting a default argument as a list will consume multiple
                   arguments from the command line.  It doesn't make sense to
                   supply this more than once.
@@ -105,6 +105,7 @@ command:
 
         def commit(self, a=False, m=None, amend=False):
             """Commit a change to the index"""
+            print 'Committing'
 
     if __name__ == '__main__':
         GitClone()
@@ -141,3 +142,4 @@ Let's see what this looks like on the command line:
       -h, --help  show this help message and exit
 
     $ python examples/git_clone.py commit -am "Message"
+    Committing
