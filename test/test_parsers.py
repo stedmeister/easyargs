@@ -140,18 +140,10 @@ class TestGitCloneExample(unittest.TestCase):
                          ['-h'],
                          None,
                          True)
-        self.assertEqual(stdout, """usage: test_parsers [-h] {clone,commit} ...
-
-A git clone
-
-positional arguments:
-  {clone,commit}  sub-command help
-    clone         Clone a repository
-    commit        Commit a change to the index
-
-optional arguments:
-  -h, --help      show this help message and exit
-""")
+        self.assertTrue('usage: test_parsers [-h]' in stdout)
+        self.assertTrue('A git clone' in stdout)
+        self.assertTrue('clone         Clone a repository' in stdout)
+        self.assertTrue('commit        Commit a change to the index' in stdout)
 
     def test_simple_clone(self):
         """A test to ensure that basic argument parsing works"""
