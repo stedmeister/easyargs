@@ -67,21 +67,21 @@ The goal of easyargs is to avoid having complicated configuration parameters,
 and let the function specify things, however, the following list of rules might
 be useful:
 
-- main(arg): arg is a required positional argument
+- `main(arg)`: arg is a required positional argument
 - main(_arg): arg is an optional positional argument
 - main(arg=int, _arg=int): Setting a default value as a basic type will keep
   the argument positional, but coerce it to that type
   only tested with int / float
 - main(arg=list): Setting a default argument as a list will consume multiple
-                  arguments from the command line.  It doesn't make sense to
-                  supply this more than once.
+  arguments from the command line.  It doesn't make sense to
+  supply this more than once.
 - main(arg=value): Creates an optional argument with a default value of value
 - main(arg=3): If the default value is of type int / float.  Then if a value is
-               set it will be coerced to the type.
+  set it will be coerced to the type.
 - main(arg=True): If the default value is of type bool, then arg becomes a flag
-                  option.
+  option.
 - main(a=values): If the argument has a length of 1, then it will create a short
-                  argument.
+  argument.
 
 
 Sub commands
