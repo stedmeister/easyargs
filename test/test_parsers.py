@@ -23,7 +23,6 @@ def parser_test_helper(parser,
     @mock.patch('sys.stderr', new_callable=six.StringIO)
     @mock.patch('sys.exit')
     def handle_parser_call(exit_called, stderr, stdout):
-
         exit_called.side_effect = SysExitCalled('sys.exit()')
         try:
             result = parser()
@@ -170,9 +169,9 @@ optional arguments:
                                             None,
                                             True)
 
-        self.assertEqual(stderr, """usage: test_parsers clone [-h] src [dest]
-test_parsers clone: error: too few arguments
-""")
+        # Output signature changed in python 3, so must assert on part of message
+        self.assertTrue("""usage: test_parsers clone [-h] src [dest]
+test_parsers clone: error:""" in stderr)
 
     def test_commit_no_parameters(self):
         """This tests just the commit parameters i.e. git commit"""
