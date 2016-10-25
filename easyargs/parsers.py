@@ -1,6 +1,7 @@
 import inspect
 import argparse
 import six
+import re
 
 def handle_parser(parser):
     args = vars( parser.parse_args() )
@@ -19,6 +20,20 @@ def handle_parser(parser):
 
     # Call the original function with the parser args
     function(**args)
+
+def parser_help_text(help_text):
+    main_text = ''
+    params_help = {}
+
+    for line in help_text.splitlines():
+        line = line.strip()
+        match = re.search(r':\s*param\s*(?P<param>\w+)\s*:(?P<help>.*)$', line)
+        if match:
+            params_help[match.group('param')] = match.group('help').strip()
+        else:
+            main_text += line
+
+    return main_text, params_help
 
 def create_base_parser(obj):
     # Get the help text for the function
