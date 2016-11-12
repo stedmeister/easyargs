@@ -12,16 +12,15 @@ def handle_parser(parser):
     except KeyError:
         return
 
-    # Remove any arguments that have not been supplied
-    # actual_args = {}
-    # for argument, value in six.iteritems(args):
-    #     if value != None:
-    #         actual_args[argument] = value
-
     # Call the original function with the parser args
     function(**args)
 
 def parser_help_text(help_text):
+    """Takes the help text supplied as a doc string and extraxts the
+    description and any param arguments."""
+    if help_text == None:
+        return None, {}
+
     main_text = ''
     params_help = {}
 
@@ -38,16 +37,23 @@ def parser_help_text(help_text):
 def create_base_parser(obj):
     # Get the help text for the function
     help_text = inspect.getdoc(obj)
+    main_text, params_help = parser_help_text(help_text)
 
-    parser = argparse.ArgumentParser(description=help_text)
+    parser = argparse.ArgumentParser(description=main_text)
     return parser
 
-def calculate_default_type(arg, has_default, default_value):
+def calculate_default_type(arg, has_default, default_value, params_help):
     """This function looks at the default value and returns the type that
        should be supplied to the parser"""
     positional = True
     arg_params = {}
     arg_name = arg
+
+    # Check to see if we have help text for this argument
+    try:
+        arg_params['help'] = params_help[arg_name]
+    except KeyError:
+        pass
 
     # If we have a default value, then this is not positional
     if has_default:
@@ -90,6 +96,10 @@ def function_parser(function, parser):
     # Store the function pointer on the parser for later use
     parser.set_defaults(func=function)
 
+    # Get the help text and parse it for params
+    help_text = inspect.getdoc(function)
+    main_text, params_help = parser_help_text(help_text)
+
     # Get the function information
     args, varargs, keywords, defaults = inspect.getargspec(function)
     if args == None:
@@ -107,10 +117,10 @@ def function_parser(function, parser):
     num_required_args = len(args) - len(defaults)
     for idx, arg in enumerate(args):
         if idx < num_required_args:
-            arg_name, arg_params = calculate_default_type(arg, False, None)
+            arg_name, arg_params = calculate_default_type(arg, False, None, params_help)
         else:
             default_value = defaults[idx - num_required_args]
-            arg_name, arg_params = calculate_default_type(arg, True, default_value)
+            arg_name, arg_params = calculate_default_type(arg, True, default_value, params_help)
 
         parser.add_argument(arg_name, **arg_params)
 

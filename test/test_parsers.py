@@ -204,3 +204,79 @@ test_parsers clone: error:""" in stderr)
                                             ['commit', '-am', 'Foo', '--amend'],
                                             (True, 'Foo', True),
                                             False)
+
+
+class TestParsersWithArgHelpers(unittest.TestCase):
+    def setUp(self):
+        called = mock.MagicMock()
+        self.function_called = called
+        @easyargs
+        class GitClone(object):
+            """A git clone"""
+
+            def clone(self, src, _dest):
+                """
+                Clone a repository
+                :param src: the repository to clone
+                :param _dest: the destination for cloning
+                """
+                called(src, _dest)
+
+            def commit(self, a=False, m=None, amend=False):
+                """
+                Commit a change to the index
+                :param a: Add all modified flags to the index
+                :param amend: Amend the last commit
+                """
+                called(a, m, amend)
+
+        self.parser = GitClone
+
+    def test_clone_help_text(self):
+        stdout, stderr = parser_test_helper(self.parser,
+                         self.function_called,
+                         ['clone', '-h'],
+                         None,
+                         True)
+
+        self.assertTrue('usage: test_parsers clone [-h] src [dest]' in stdout)
+        self.assertTrue('src         the repository to clone' in stdout)
+        self.assertTrue('dest        the destination for cloning' in stdout)
+
+    def test_commit_help_text_missing_parser(self):
+        stdout, stderr = parser_test_helper(self.parser,
+                         self.function_called,
+                         ['commit', '-h'],
+                         None,
+                         True)
+
+        self.assertTrue('usage: test_parsers commit [-h] [-a] [-m M] [--amend]' in stdout)
+        self.assertTrue('-a          Add all modified flags to the index' in stdout)
+        self.assertTrue('-m M\n' in stdout)
+        self.assertTrue('--amend     Amend the last commit' in stdout)
+
+class TestParsersWithArgHelpers(unittest.TestCase):
+    def setUp(self):
+        called = mock.MagicMock()
+        self.function_called = called
+        @easyargs
+        def poor_formatting(self, src, _dest):
+            """
+            Clone a repository
+            :    param src: the repository to clone
+            :param    _dest     : the destination for cloning
+            """
+            called(src, _dest)
+
+        self.parser = poor_formatting
+
+    def test_doc_text_formatting(self):
+        stdout, stderr = parser_test_helper(self.parser,
+                         self.function_called,
+                         ['-h'],
+                         None,
+                         True)
+
+        self.assertTrue('usage: test_parsers [-h] src [dest]' in stdout)
+        self.assertTrue('src         the repository to clone' in stdout)
+        self.assertTrue('dest        the destination for cloning' in stdout)
