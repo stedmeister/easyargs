@@ -90,25 +90,32 @@ Sub commands
 Whilst having a simple function parser is great, sometimes you need to have a
 sub parser.  This can be created by wrapping a number of functions in a class.
 Let's demonstrate this with another example by duplicating part of the git
-command:
+command.  At the same time we'll introduce the concept of using the docstring
+to include the help text for each function parameter.
 
 .. code:: python
 
-    import easyargs
+  import easyargs
 
-    @easyargs
-    class GitClone(object):
-        """A git clone"""
+  @easyargs
+  class GitClone(object):
+      """A git clone"""
 
-        def clone(self, src, _dest):
-            """Clone a repository"""
+      def clone(self, src, _dest):
+          """
+          Clone a repository
+          :param src: The source repository to clone from
+          :param _dest: The directory to check the source code to
+          """
 
-        def commit(self, a=False, m=None, amend=False):
-            """Commit a change to the index"""
-            print 'Committing'
-
-    if __name__ == '__main__':
-        GitClone()
+      def commit(self, a=False, m=None, amend=False):
+          """
+          Commit a change to the index
+          :param a: Add all tracked files to the index
+          :param m: Supply the commit message on the command line
+          :param amend: Amend the previous commit
+          """
+          print 'Committing {m}'.format(m=m)
 
 Let's see what this looks like on the command line:
 
@@ -135,11 +142,11 @@ Let's see what this looks like on the command line:
     usage: git_clone.py clone [-h] src [dest]
 
     positional arguments:
-      src
-      dest
+      src         The source repository to clone from
+      dest        The directory to check the source code to
 
     optional arguments:
       -h, --help  show this help message and exit
 
     $ python examples/git_clone.py commit -am "Message"
-    Committing
+    Committing Message

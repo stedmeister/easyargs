@@ -141,5 +141,6 @@ def class_parser(klass, parser, method_filter=filter_private_methods):
     # Let's now create a sub parser for each method found
     for name, method in methods_to_expose:
         help_text = inspect.getdoc(method)
-        method_parser = subparsers.add_parser(name, help=help_text)
+        main_text, params_help = parser_help_text(help_text)
+        method_parser = subparsers.add_parser(name, help=main_text)
         function_parser(method, method_parser)

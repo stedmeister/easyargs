@@ -232,6 +232,19 @@ class TestParsersWithArgHelpers(unittest.TestCase):
 
         self.parser = GitClone
 
+    def test_param_info_removed_from_help(self):
+        stdout, stderr = parser_test_helper(self.parser,
+                         self.function_called,
+                         ['-h'],
+                         None,
+                         True)
+        print (stdout)
+        self.assertTrue('usage: test_parsers [-h] {clone,commit}' in stdout)
+        self.assertTrue('clone         Clone a repository' in stdout)
+        self.assertTrue('commit        Commit a change to the index' in stdout)
+        self.assertTrue('param' not in stdout)
+
+
     def test_clone_help_text(self):
         stdout, stderr = parser_test_helper(self.parser,
                          self.function_called,
@@ -242,6 +255,7 @@ class TestParsersWithArgHelpers(unittest.TestCase):
         self.assertTrue('usage: test_parsers clone [-h] src [dest]' in stdout)
         self.assertTrue('src         the repository to clone' in stdout)
         self.assertTrue('dest        the destination for cloning' in stdout)
+        self.assertTrue('param' not in stdout)
 
     def test_commit_help_text_missing_parser(self):
         stdout, stderr = parser_test_helper(self.parser,
@@ -254,8 +268,9 @@ class TestParsersWithArgHelpers(unittest.TestCase):
         self.assertTrue('-a          Add all modified flags to the index' in stdout)
         self.assertTrue('-m M\n' in stdout)
         self.assertTrue('--amend     Amend the last commit' in stdout)
+        self.assertTrue('param' not in stdout)
 
-class TestParsersWithArgHelpers(unittest.TestCase):
+class TestParsersWithPoorFormattedArgParsers(unittest.TestCase):
     def setUp(self):
         called = mock.MagicMock()
         self.function_called = called
@@ -280,3 +295,4 @@ class TestParsersWithArgHelpers(unittest.TestCase):
         self.assertTrue('usage: test_parsers [-h] src [dest]' in stdout)
         self.assertTrue('src         the repository to clone' in stdout)
         self.assertTrue('dest        the destination for cloning' in stdout)
+        self.assertTrue('param' not in stdout)
