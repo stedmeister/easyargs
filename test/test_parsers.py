@@ -239,7 +239,9 @@ class TestParsersWithArgHelpers(unittest.TestCase):
                          None,
                          True)
         print (stdout)
-        self.assertTrue('usage: test_parsers [-h] {clone,commit}' in stdout)
+        usage_string = ('usage: test_parsers [-h] {clone,commit}' in stdout) or
+                       ('usage: test_parsers [-h] {commit,clone}' in stdout)
+        self.assertTrue(usage_string)
         self.assertTrue('clone         Clone a repository' in stdout)
         self.assertTrue('commit        Commit a change to the index' in stdout)
         self.assertTrue('param' not in stdout)
