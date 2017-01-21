@@ -13,8 +13,7 @@ def make_easy_args(obj=None, auto_call=True):
                 klass_instance = f()
                 parsers.class_parser(klass_instance, parser)
             if auto_call:
-                parsers.handle_parser(parser)
-
+                return parsers.handle_parser(parser)
 
             return parser
         return decorated

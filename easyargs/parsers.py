@@ -13,7 +13,7 @@ def handle_parser(parser):
         return
 
     # Call the original function with the parser args
-    function(**args)
+    return function(**args)
 
 def parser_help_text(help_text):
     """Takes the help text supplied as a doc string and extraxts the

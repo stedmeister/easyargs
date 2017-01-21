@@ -275,7 +275,7 @@ class TestParsersWithPoorFormattedArgParsers(unittest.TestCase):
         called = mock.MagicMock()
         self.function_called = called
         @easyargs
-        def poor_formatting(self, src, _dest):
+        def poor_formatting(src, _dest):
             """
             Clone a repository
             :    param src: the repository to clone
@@ -296,3 +296,35 @@ class TestParsersWithPoorFormattedArgParsers(unittest.TestCase):
         self.assertTrue('src         the repository to clone' in stdout)
         self.assertTrue('dest        the destination for cloning' in stdout)
         self.assertTrue('param' not in stdout)
+
+
+class TestFunctionValueReturned(unittest.TestCase):
+    def setUp(self):
+        @easyargs
+        def return_some_value(value=5):
+            return value
+
+        self.parser = return_some_value
+
+    @mock.patch('sys.argv', [__name__])
+    def test_a_value_is_returned(self):
+        result = self.parser()
+        self.assertEqual(result, 5)
+
+
+class TestValueReturnedWhenNotUsingAutoCall(unittest.TestCase):
+    """Tests that the auto_call=False is not clobbered, although
+    this is mainly used for testing."""
+    def setUp(self):
+        @easyargs(auto_call=False)
+        def return_some_value(value=5):
+            return value
+
+        self.parser = return_some_value
+
+    @mock.patch('sys.argv', [__name__])
+    def test_a_value_is_returned(self):
+        parser = self.parser()
+        from easyargs import parsers
+        result = parsers.handle_parser(parser)
+        self.assertEqual(result, 5)
