@@ -117,6 +117,10 @@ to include the help text for each function parameter.
           """
           print 'Committing {m}'.format(m=m)
 
+    if __name__ == '__main__':
+        GitClone()
+
+
 Let's see what this looks like on the command line:
 
 .. code::
