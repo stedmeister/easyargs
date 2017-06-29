@@ -33,7 +33,7 @@ def parser_test_helper(parser,
 
         assert(exit_called.called == exit_expected)
         if not exit_called.called:
-            if expected_values == None:
+            if expected_values is None:
                 call_function.assert_not_called()
             else:
                 call_function.assert_called_with(*expected_values)

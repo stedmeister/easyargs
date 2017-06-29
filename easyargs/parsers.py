@@ -20,7 +20,7 @@ def handle_parser(parser):
 def parser_help_text(help_text):
     """Takes the help text supplied as a doc string and extraxts the
     description and any param arguments."""
-    if help_text == None:
+    if help_text is None:
         return None, {}
 
     main_text = ''
@@ -107,10 +107,10 @@ def function_parser(function, parser):
 
     # Get the function information
     args, varargs, keywords, defaults = inspect.getargspec(function)
-    if args == None:
+    if args is None:
         args = []
 
-    if defaults == None:
+    if defaults is None:
         defaults = []
 
     # If the function is a class method, it will have a self that needs to be removed

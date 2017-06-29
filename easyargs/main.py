@@ -29,7 +29,7 @@ def create_sub_parser(parser, method_info):
 
     # Try to get the docstring for the help text
     help_text = inspect.getdoc(method)
-    if help_text == None:
+    if help_text is None:
         help_text = '{n} help'.format(n=name)
 
     local_parser = parser.add_parser(name, help=help_text)
@@ -39,7 +39,7 @@ def create_sub_parser(parser, method_info):
     args, _, _, defaults = inspect.getargspec(method)
 
     num_positional = len(args)
-    if defaults != None:
+    if defaults is not None:
         num_positional -= len(defaults)
 
     for idx, arg in enumerate(args):
@@ -53,12 +53,12 @@ def create_sub_parser(parser, method_info):
             print arg, default_value
             default_type = get_default_type(default_value)
             action = 'store'
-            if default_value == False:
-                action = 'store_true'
-            elif default_value == True:
+            if default_value:
                 action = 'store_false'
+            else:
+                action = 'store_true'
 
-            if default_type != None:
+            if default_type is not None:
                 print arg, default_type, action
                 local_parser.add_argument('--' + arg, type=default_type, action=action)
             else:
@@ -96,7 +96,7 @@ def handle_args(args):
     # Strip out not supplied arguments
     actual_args = {}
     for arg, value in args.iteritems():
-        if value != None:
+        if value is not None:
             actual_args[arg] = value
 
     print func, actual_args
