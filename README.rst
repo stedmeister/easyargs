@@ -15,6 +15,8 @@ required argument and two optional ones:
 
 .. code:: python
 
+    from __future__ import print_function
+
     import easyargs
 
 
@@ -22,7 +24,7 @@ required argument and two optional ones:
     def main(name, count=1, greeting='Hello'):
         """A simple greeting program"""
         for i in range(count):
-            print '{greeting} {name}!'.format(greeting=greeting, name=name)
+            print('{greeting} {name}!'.format(greeting=greeting, name=name))
 
 
     if __name__ == '__main__':
@@ -96,6 +98,8 @@ to include the help text for each function parameter.
 
 .. code:: python
 
+    from __future__ import print_function
+
     import easyargs
 
 
@@ -117,7 +121,7 @@ to include the help text for each function parameter.
             :param m: Supply the commit message on the command line
             :param amend: Amend the previous commit
             """
-            print 'Committing {m}'.format(m=m)
+            print('Committing {m}'.format(m=m))
 
 
     if __name__ == '__main__':

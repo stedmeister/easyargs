@@ -3,7 +3,7 @@
    utility, but the options can be complicated.  This module aims to be a
    simple wrapper around the module"""
 
-
+from __future__ import print_function
 import argparse
 import inspect
 
@@ -50,7 +50,7 @@ def create_sub_parser(parser, method_info):
         else:
             # Get the default value so that we can coerce it
             default_value = defaults[idx - num_positional]
-            print arg, default_value
+            print(arg, default_value)
             default_type = get_default_type(default_value)
             action = 'store'
             if default_value:
@@ -59,7 +59,7 @@ def create_sub_parser(parser, method_info):
                 action = 'store_true'
 
             if default_type is not None:
-                print arg, default_type, action
+                print(arg, default_type, action)
                 local_parser.add_argument('--' + arg, type=default_type, action=action)
             else:
                 local_parser.add_argument('--' + arg, action=action)
@@ -99,27 +99,27 @@ def handle_args(args):
         if value is not None:
             actual_args[arg] = value
 
-    print func, actual_args
+    print(func, actual_args)
     func(**actual_args)
 
 
 def handle_parser(object_instance, method_filter=filter_private_methods):
     parser = get_parser(object_instance, method_filter)
     args = parser.parse_args()
-    print args
+    print(args)
     handle_args(args)
 
 
 class Base(object):
     def base(self, think):
-        print 'base'
+        print('base')
 
     def _private(self):
-        print '_private'
+        print('_private')
 
 
 def j():
-    print 'JJJJJ'
+    print('JJJJJ')
 
 
 class Top(Base):
@@ -131,13 +131,13 @@ class Top(Base):
         a: blah
         b: default
         """
-        print a, b
+        print(a, b)
 
     def test(self, thing=3, foo=False):
-        print 'test', thing
+        print('test', thing)
 
     def _bottom(self, c, d):
-        print c, d
+        print(c, d)
 
 
 def main():

@@ -1,5 +1,7 @@
 """This example exists to show multiple commands"""
 
+from __future__ import print_function
+
 import easyargs
 
 
@@ -21,7 +23,7 @@ class GitClone(object):
         :param m: Supply the commit message on the command line
         :param amend: Amend the previous commit
         """
-        print 'Committing {m}'.format(m=m)
+        print('Committing {m}'.format(m=m))
 
 
 if __name__ == '__main__':
