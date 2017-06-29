@@ -1,8 +1,6 @@
 from __future__ import print_function
 
 import unittest
-import mock
-import six
 
 from easyargs.parsers import parser_help_text
 

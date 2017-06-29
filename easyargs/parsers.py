@@ -1,6 +1,5 @@
 import inspect
 import argparse
-import six
 import re
 
 
