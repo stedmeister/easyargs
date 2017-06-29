@@ -27,7 +27,7 @@ def parser_test_helper(parser,
     def handle_parser_call(exit_called, stderr, stdout):
         exit_called.side_effect = SysExitCalled('sys.exit()')
         try:
-            result = parser()
+            parser()
         except SysExitCalled:
             pass
 
