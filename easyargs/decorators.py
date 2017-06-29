@@ -2,6 +2,7 @@ from . import parsers
 import functools
 import inspect
 
+
 def make_easy_args(obj=None, auto_call=True):
     def decorate(f):
         @functools.wraps(f)

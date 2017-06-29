@@ -2,6 +2,7 @@
 
 import easyargs
 
+
 @easyargs
 class GitClone(object):
     """A git clone"""
@@ -21,6 +22,7 @@ class GitClone(object):
         :param amend: Amend the previous commit
         """
         print 'Committing {m}'.format(m=m)
+
 
 if __name__ == '__main__':
     GitClone()

@@ -7,8 +7,10 @@
 import argparse
 import inspect
 
+
 def filter_private_methods(method):
     return not method.startswith('_')
+
 
 def get_default_type(value):
     TYPES = (int, str)
@@ -19,7 +21,8 @@ def get_default_type(value):
 
     if found_type in TYPES:
         return found_type
-    return None 
+    return None
+
 
 def create_sub_parser(parser, method_info):
     name, method = method_info
@@ -38,7 +41,7 @@ def create_sub_parser(parser, method_info):
     num_positional = len(args)
     if defaults != None:
         num_positional -= len(defaults)
-      
+
     for idx, arg in enumerate(args):
         # Work out whether arg is positional or optional
         if idx < num_positional:
@@ -62,8 +65,8 @@ def create_sub_parser(parser, method_info):
                 local_parser.add_argument('--' + arg, action=action)
 
         # Store the method on the parser so we can call it later
-        local_parser.set_defaults(func=method) 
-        
+        local_parser.set_defaults(func=method)
+
 
 def get_parser(object_instance, method_filter=filter_private_methods):
     # Create a top level parser and a sub parser object
@@ -79,9 +82,9 @@ def get_parser(object_instance, method_filter=filter_private_methods):
     # Let's now create a sub parser for each method found
     for method_info in methods_to_expose:
         create_sub_parser(subparsers, method_info)
-      
 
     return parser
+
 
 def handle_args(args):
     # Convert args to a dict
@@ -94,21 +97,17 @@ def handle_args(args):
     actual_args = {}
     for arg, value in args.iteritems():
         if value != None:
-            actual_args[arg] = value 
+            actual_args[arg] = value
 
     print func, actual_args
     func(**actual_args)
-    
-    
 
-    
 
 def handle_parser(object_instance, method_filter=filter_private_methods):
     parser = get_parser(object_instance, method_filter)
     args = parser.parse_args()
     print args
     handle_args(args)
-
 
 
 class Base(object):
@@ -118,30 +117,32 @@ class Base(object):
     def _private(self):
         print '_private'
 
+
 def j():
-   print 'JJJJJ'
+    print 'JJJJJ'
+
 
 class Top(Base):
-  def top(self, a, b='default'):
-      """This is the top function that does things
+    def top(self, a, b='default'):
+        """This is the top function that does things
 
-      It is also helpful
+        It is also helpful
 
-      a: blah
-      b: default
-      """
-      print a, b
+        a: blah
+        b: default
+        """
+        print a, b
 
-  def test(self, thing=3, foo=False):
-    print 'test', thing 
+    def test(self, thing=3, foo=False):
+        print 'test', thing
 
-  def _bottom(self, c, d):
-     print c, d
+    def _bottom(self, c, d):
+        print c, d
 
 
 def main():
-   t = Top()
-   handle_parser(t)
+    t = Top()
+    handle_parser(t)
 
 
 if __name__ == '__main__':

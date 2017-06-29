@@ -3,8 +3,9 @@ import argparse
 import six
 import re
 
+
 def handle_parser(parser):
-    args = vars( parser.parse_args() )
+    args = vars(parser.parse_args())
 
     # Get the handler function
     try:
@@ -14,6 +15,7 @@ def handle_parser(parser):
 
     # Call the original function with the parser args
     return function(**args)
+
 
 def parser_help_text(help_text):
     """Takes the help text supplied as a doc string and extraxts the
@@ -34,6 +36,7 @@ def parser_help_text(help_text):
 
     return main_text, params_help
 
+
 def create_base_parser(obj):
     # Get the help text for the function
     help_text = inspect.getdoc(obj)
@@ -41,6 +44,7 @@ def create_base_parser(obj):
 
     parser = argparse.ArgumentParser(description=main_text)
     return parser
+
 
 def calculate_default_type(arg, has_default, default_value, params_help):
     """This function looks at the default value and returns the type that
@@ -90,6 +94,7 @@ def calculate_default_type(arg, has_default, default_value, params_help):
 
     return arg_name, arg_params
 
+
 def function_parser(function, parser):
     """This function parses a function and adds its arguments to the supplied parser"""
 
@@ -124,9 +129,11 @@ def function_parser(function, parser):
 
         parser.add_argument(arg_name, **arg_params)
 
+
 def filter_private_methods(method):
     """Simple filter method.  Ignores private functions"""
     return not method.startswith('_')
+
 
 def class_parser(klass, parser, method_filter=filter_private_methods):
     # Create a subparser object to handle the sub commands

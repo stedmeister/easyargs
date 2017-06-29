@@ -17,6 +17,7 @@ required argument and two optional ones:
 
     import easyargs
 
+
     @easyargs
     def main(name, count=1, greeting='Hello'):
         """A simple greeting program"""
@@ -95,27 +96,29 @@ to include the help text for each function parameter.
 
 .. code:: python
 
-  import easyargs
+    import easyargs
 
-  @easyargs
-  class GitClone(object):
-      """A git clone"""
 
-      def clone(self, src, _dest):
-          """
-          Clone a repository
-          :param src: The source repository to clone from
-          :param _dest: The directory to check the source code to
-          """
+    @easyargs
+    class GitClone(object):
+        """A git clone"""
 
-      def commit(self, a=False, m=None, amend=False):
-          """
-          Commit a change to the index
-          :param a: Add all tracked files to the index
-          :param m: Supply the commit message on the command line
-          :param amend: Amend the previous commit
-          """
-          print 'Committing {m}'.format(m=m)
+        def clone(self, src, _dest):
+            """
+            Clone a repository
+            :param src: The source repository to clone from
+            :param _dest: The directory to check the source code to
+            """
+
+        def commit(self, a=False, m=None, amend=False):
+            """
+            Commit a change to the index
+            :param a: Add all tracked files to the index
+            :param m: Supply the commit message on the command line
+            :param amend: Amend the previous commit
+            """
+            print 'Committing {m}'.format(m=m)
+
 
     if __name__ == '__main__':
         GitClone()
