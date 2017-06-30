@@ -1,10 +1,9 @@
 from __future__ import print_function
 
 import unittest
-import mock
-import six
 
 from easyargs.parsers import parser_help_text
+
 
 class TestHelpText(unittest.TestCase):
     def test_no_params_help(self):
@@ -23,10 +22,10 @@ class TestHelpText(unittest.TestCase):
         main_text, params_help = parser_help_text(input)
         self.assertEqual(main_text, 'A simple greeting program')
         self.assertEqual(params_help, {
-                'name': 'Name to greet.',
-                'count': 'How many times to greet them.',
-                'greeting': 'Which greeting to use.'
-            })
+            'name': 'Name to greet.',
+            'count': 'How many times to greet them.',
+            'greeting': 'Which greeting to use.'
+        })
 
     def test_no_main_text(self):
         input = """
@@ -37,10 +36,10 @@ class TestHelpText(unittest.TestCase):
         main_text, params_help = parser_help_text(input)
         self.assertEqual(main_text, '')
         self.assertEqual(params_help, {
-                'name': 'Name to greet.',
-                'count': 'How many times to greet them.',
-                'greeting': 'Which greeting to use.'
-            })
+            'name': 'Name to greet.',
+            'count': 'How many times to greet them.',
+            'greeting': 'Which greeting to use.'
+        })
 
     def test_random_white_space(self):
         input = """A simple greeting program
@@ -51,7 +50,7 @@ class TestHelpText(unittest.TestCase):
         main_text, params_help = parser_help_text(input)
         self.assertEqual(main_text, 'A simple greeting program')
         self.assertEqual(params_help, {
-                'name': 'Name to greet.',
-                'count': 'How many times to greet them.',
-                'greeting': 'Which greeting to use.'
-            })
+            'name': 'Name to greet.',
+            'count': 'How many times to greet them.',
+            'greeting': 'Which greeting to use.'
+        })

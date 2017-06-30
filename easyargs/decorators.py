@@ -2,6 +2,7 @@ from . import parsers
 import functools
 import inspect
 
+
 def make_easy_args(obj=None, auto_call=True):
     def decorate(f):
         @functools.wraps(f)
@@ -18,7 +19,7 @@ def make_easy_args(obj=None, auto_call=True):
             return parser
         return decorated
 
-    if obj != None:
+    if obj is not None:
         return decorate(obj)
 
     return decorate

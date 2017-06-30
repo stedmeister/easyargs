@@ -6,6 +6,7 @@ import six
 
 import easyargs
 
+
 class SysExitCalled(Exception):
     """This exception will be thrown when sys.exit is called.  This
        is needed to 'halt' program execution."""
@@ -18,6 +19,7 @@ def parser_test_helper(parser,
                        exit_expected):
 
     mocked_sysv = [__name__] + arguments
+
     @mock.patch('sys.argv', mocked_sysv)
     @mock.patch('sys.stdout', new_callable=six.StringIO)
     @mock.patch('sys.stderr', new_callable=six.StringIO)
@@ -25,13 +27,13 @@ def parser_test_helper(parser,
     def handle_parser_call(exit_called, stderr, stdout):
         exit_called.side_effect = SysExitCalled('sys.exit()')
         try:
-            result = parser()
+            parser()
         except SysExitCalled:
             pass
 
         assert(exit_called.called == exit_expected)
         if not exit_called.called:
-            if expected_values == None:
+            if expected_values is None:
                 call_function.assert_not_called()
             else:
                 call_function.assert_called_with(*expected_values)
@@ -39,6 +41,7 @@ def parser_test_helper(parser,
 
     stdout, stderr = handle_parser_call()
     return stdout.getvalue(), stderr.getvalue()
+
 
 # Work out how to mock the function
 class TestDecorator(unittest.TestCase):
@@ -83,6 +86,7 @@ class TestDecorator(unittest.TestCase):
         with mock.patch('sys.argv', [__name__, '--arg1', '1', '--arg3', '3', '--arg2', '2']):
             main_with_only_opt_args()
 
+
 class TestSampleInterfaces(unittest.TestCase):
     def test_function_is_actually_called(self):
 
@@ -108,18 +112,19 @@ class TestSampleInterfaces(unittest.TestCase):
         result = parser.parse_args(['person'])
         result = vars(result)
         del result['func']
-        self.assertEqual(result, { 'name': 'person', 'count': 1, 'greeting': 'Hello' })
+        self.assertEqual(result, {'name': 'person', 'count': 1, 'greeting': 'Hello'})
 
         result = parser.parse_args(['person', '--count', '4'])
         result = vars(result)
         del result['func']
-        self.assertEqual(result, { 'name': 'person', 'count': 4, 'greeting': 'Hello' })
+        self.assertEqual(result, {'name': 'person', 'count': 4, 'greeting': 'Hello'})
 
 
 class TestGitCloneExample(unittest.TestCase):
     def setUp(self):
         called = mock.MagicMock()
         self.function_called = called
+
         @easyargs
         class GitClone(object):
             """A git clone"""
@@ -136,10 +141,10 @@ class TestGitCloneExample(unittest.TestCase):
 
     def test_help_text(self):
         stdout, stderr = parser_test_helper(self.parser,
-                         self.function_called,
-                         ['-h'],
-                         None,
-                         True)
+                                            self.function_called,
+                                            ['-h'],
+                                            None,
+                                            True)
         self.assertTrue('usage: test_parsers [-h]' in stdout)
         self.assertTrue('A git clone' in stdout)
         self.assertTrue('clone         Clone a repository' in stdout)
@@ -210,6 +215,7 @@ class TestParsersWithArgHelpers(unittest.TestCase):
     def setUp(self):
         called = mock.MagicMock()
         self.function_called = called
+
         @easyargs
         class GitClone(object):
             """A git clone"""
@@ -234,11 +240,11 @@ class TestParsersWithArgHelpers(unittest.TestCase):
 
     def test_param_info_removed_from_help(self):
         stdout, stderr = parser_test_helper(self.parser,
-                         self.function_called,
-                         ['-h'],
-                         None,
-                         True)
-        print (stdout)
+                                            self.function_called,
+                                            ['-h'],
+                                            None,
+                                            True)
+        print(stdout)
         usage_string = ('usage: test_parsers [-h] {clone,commit}' in stdout) or \
                        ('usage: test_parsers [-h] {commit,clone}' in stdout)
         self.assertTrue(usage_string)
@@ -246,13 +252,12 @@ class TestParsersWithArgHelpers(unittest.TestCase):
         self.assertTrue('commit        Commit a change to the index' in stdout)
         self.assertTrue('param' not in stdout)
 
-
     def test_clone_help_text(self):
         stdout, stderr = parser_test_helper(self.parser,
-                         self.function_called,
-                         ['clone', '-h'],
-                         None,
-                         True)
+                                            self.function_called,
+                                            ['clone', '-h'],
+                                            None,
+                                            True)
 
         self.assertTrue('usage: test_parsers clone [-h] src [dest]' in stdout)
         self.assertTrue('src         the repository to clone' in stdout)
@@ -261,10 +266,10 @@ class TestParsersWithArgHelpers(unittest.TestCase):
 
     def test_commit_help_text_missing_parser(self):
         stdout, stderr = parser_test_helper(self.parser,
-                         self.function_called,
-                         ['commit', '-h'],
-                         None,
-                         True)
+                                            self.function_called,
+                                            ['commit', '-h'],
+                                            None,
+                                            True)
 
         self.assertTrue('usage: test_parsers commit [-h] [-a] [-m M] [--amend]' in stdout)
         self.assertTrue('-a          Add all modified flags to the index' in stdout)
@@ -272,10 +277,12 @@ class TestParsersWithArgHelpers(unittest.TestCase):
         self.assertTrue('--amend     Amend the last commit' in stdout)
         self.assertTrue('param' not in stdout)
 
+
 class TestParsersWithPoorFormattedArgParsers(unittest.TestCase):
     def setUp(self):
         called = mock.MagicMock()
         self.function_called = called
+
         @easyargs
         def poor_formatting(src, _dest):
             """
@@ -289,10 +296,10 @@ class TestParsersWithPoorFormattedArgParsers(unittest.TestCase):
 
     def test_doc_text_formatting(self):
         stdout, stderr = parser_test_helper(self.parser,
-                         self.function_called,
-                         ['-h'],
-                         None,
-                         True)
+                                            self.function_called,
+                                            ['-h'],
+                                            None,
+                                            True)
 
         self.assertTrue('usage: test_parsers [-h] src [dest]' in stdout)
         self.assertTrue('src         the repository to clone' in stdout)
