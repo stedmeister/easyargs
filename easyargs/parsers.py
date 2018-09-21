@@ -31,8 +31,9 @@ def parser_help_text(help_text):
         if match:
             params_help[match.group('param')] = match.group('help').strip()
         else:
-            main_text += line
+            main_text += line + ' '
 
+    main_text = main_text.strip()
     return main_text, params_help
 
 
