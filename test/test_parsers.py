@@ -286,7 +286,8 @@ class TestParsersWithPoorFormattedArgParsers(unittest.TestCase):
         @easyargs
         def poor_formatting(src, _dest):
             """
-            Clone a repository
+            Clone a repository, but
+            with a new line
             :    param src: the repository to clone
             :param    _dest     : the destination for cloning
             """
@@ -301,6 +302,7 @@ class TestParsersWithPoorFormattedArgParsers(unittest.TestCase):
                                             None,
                                             True)
 
+        self.assertTrue('but with' in stdout)
         self.assertTrue('usage: test_parsers [-h] src [dest]' in stdout)
         self.assertTrue('src         the repository to clone' in stdout)
         self.assertTrue('dest        the destination for cloning' in stdout)
