@@ -1,7 +1,12 @@
 from __future__ import print_function
 
 import unittest
-import mock
+
+try:
+    import unittest.mock as mock
+except ImportError:
+    import mock
+
 import six
 
 import easyargs
