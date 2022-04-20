@@ -106,7 +106,11 @@ def function_parser(function, parser):
     main_text, params_help = parser_help_text(help_text)
 
     # Get the function information
-    args, varargs, keywords, defaults = inspect.getargspec(function)
+    try:
+        args, varargs, keywords, defaults, _, _, _ = inspect.getfullargspec(function)
+    except AttributeError:
+        args, varargs, keywords, defaults = inspect.getargspec(function)
+
     if args is None:
         args = []
 
