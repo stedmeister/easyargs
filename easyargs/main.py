@@ -36,7 +36,10 @@ def create_sub_parser(parser, method_info):
 
     # Get the arguments for the method
     # TODO: do something sensible with args and varargs
-    args, _, _, defaults = inspect.getargspec(method)
+    try:
+        args, _, _, defaults, _, _, _ = inspect.getfullargspec(method)
+    except AttributeError:
+        args, _, _, defaults = inspect.getargspec(method)
 
     num_positional = len(args)
     if defaults is not None:
